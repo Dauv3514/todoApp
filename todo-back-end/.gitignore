@@ -1,0 +1,19 @@
+# Dependencies
+**/node_modules/
+**/dist/
+**/build/
+
+# Environment variables
+**/.env*
+**/.local.env
+
+# IDE
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+.idea/
+
+# System files
+.DS_Store
