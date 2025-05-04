@@ -18,6 +18,10 @@ export class UserService {
     return await this.userRepository.save(newUser);
   }
 
+  findUserById(id: number) {
+    return this.userRepository.findOneOrFail({ where: { id } });
+  }
+
   findAll() {
     return this.userRepository.find();
   }
