@@ -10,33 +10,36 @@ import { UserService } from 'src/user/user.service';
 export class TodoService {
   constructor(
     @InjectRepository(Todo)
-    private readonly userRepository: Repository<Todo>,
+    private readonly todoRepository: Repository<Todo>,
     private userService: UserService,
   ) {}
   async create(createTodoDto: CreateTodoDto, userId: number) {
-    const newTodo = this.userRepository.create(createTodoDto);
+    const newTodo = this.todoRepository.create(createTodoDto);
     newTodo.date = new Date().toLocaleString();
     newTodo.completed = false;
     newTodo.user = await this.userService.findUserById(userId);
-    return await this.userRepository.save(newTodo);
+    return await this.todoRepository.save(newTodo);
   }
 
   findAllTodoByUserNotCompleted(userId: number) {
-    return this.userRepository.find({
+    return this.todoRepository.find({
       relations: ['user'],
       where: { user: { id: userId }, completed: false },
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} todo`;
+  findAllTodoByUserCompleted(userId: number) {
+    return this.todoRepository.find({
+      relations: ['user'],
+      where: { user: { id: userId }, completed: true },
+    });
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+  update(todoId: number) {
+    return this.todoRepository.update(todoId, { completed: true });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} todo`;
+  remove(todoId: number) {
+    return this.todoRepository.delete(todoId);
   }
 }

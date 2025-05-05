@@ -3,7 +3,7 @@ import { TodoService } from './todo.service';
 import { TodoController } from './todo.controller';
 import { Todo } from './entities/todo.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Todo]), UserModule],
