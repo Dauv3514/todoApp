@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { RoleGuard } from 'src/auth/guard/role.guard';
+import { Constants } from 'src/utils/constants';
 
 @Controller('user')
 export class UserController {
@@ -23,12 +24,14 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
+  @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
   findAll() {
     return this.userService.findAll();
   }
 
   @Delete(':id')
+  @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
