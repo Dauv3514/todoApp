@@ -1,11 +1,34 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import ActiveTodoList from "../components/ActiveTodoList";
+import custom_axios from "../axios/AxiosSetup";
+import { getLoginInfo } from "../utils/LoginInfo";
+import { toast } from "react-toastify";
+import { ApiConstants } from "../api/ApiConstants";
+
+interface TodoModel {
+  title: string;
+  date: string;
+  id: number;
+}
 
 function ActiveTodos() {
+  const [todos, setTodos] = useState<TodoModel[]>([]);
+  const getAllNotCompletedTodos = async () => {
+    const userId = getLoginInfo()?.userId;
+    if(userId != null) {
+      const response = await custom_axios.get(ApiConstants.TODO.FIND_NOT_COMPLETED(userId));
+      setTodos(response.data);
+    } else {
+      toast.info("Désolé, tu n'es pas authentifié");
+    }
+  }
+  useEffect(() => {
+    if (todos.length === 0) getAllNotCompletedTodos();
+  });
   return (
     <div>
-      <NavBar />
+      <NavBar></NavBar>
       <div className="container mb-2 flex mx-auto w-full items-center justify-center">
         <ul className="flex flex-col p-4">
           <span className="text-black text-2xl">Enter Todo :</span>
@@ -14,15 +37,18 @@ function ActiveTodos() {
             Save
           </button>
 
-          {/* Exemple statique d’un todo (à remplacer par du mapping dynamique plus tard) */}
-          <ActiveTodoList
-            key={1}
-            id={1}
-            todo="Exemple de tâche"
-            dateTime="2025-01-01"
-            deleteTodo={() => {}}
-            markCompelte={() => {}}
-          />
+          {
+            todos.map((todo)=> {
+              return <ActiveTodoList
+              key={todo.id}
+              id={todo.id}
+              todo={todo.title}
+              dateTime={todo.date}
+              deleteTodo={() => console.log("cam")}
+              markCompelte={() => console.log("completed")}
+            />
+            })
+          }
         </ul>
       </div>
     </div>
