@@ -1,15 +1,38 @@
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
+import { ApiConstants } from "../api/ApiConstants";
+import custom_axios from "../axios/AxiosSetup";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
-  const email = React.useRef<HTMLInputElement>(null);
-  const password = React.useRef<HTMLInputElement>(null);
+  const [email, setEmail ] = useState("");
+  const [password, setPassword ] = useState("");
 
-  const handleLoginClick = () => {
-    // Placeholder: Tu pourras injecter ta logique de login ici
-    console.log("Login clicked", email.current?.value, password.current?.value);
+  const handleLoginClick = async () => {
+    try {
+      if(email === "" || password === "") {
+        toast.info("Veuillez remplir les 2 champs");
+        return;
+      }
+      const response = await custom_axios.post(ApiConstants.LOGIN, {
+        email,
+        password
+      })
+      if (response.data.success) {
+        setEmail("");
+        setPassword("");
+      }
+      localStorage.setItem("token", response.data.token);
+      console.log(response.data);
+      toast.success("Account login sucessfully !!!");
+      navigate("/");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Erreur lors de la connexion :", error);
+      toast.warn(error.response.data.message);
+    }
   };
 
   return (
@@ -29,7 +52,8 @@ const Login = () => {
               Email
             </label>
             <input
-              ref={email}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="email"
               placeholder="Email"
@@ -40,11 +64,11 @@ const Login = () => {
               Password
             </label>
             <input
-              ref={password}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               type="password"
               placeholder="Password"
-              autoComplete="current-password"
             />
           </div>
           <div className="flex items-center justify-between">

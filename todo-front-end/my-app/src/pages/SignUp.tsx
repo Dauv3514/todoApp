@@ -1,22 +1,44 @@
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Todo from "../assets/logo.png";
+import custom_axios from "../axios/AxiosSetup";
+import { ApiConstants } from "../api/ApiConstants";
+import {toast} from "react-toastify";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const firstName = React.useRef<HTMLInputElement>(null);
-  const lastName = React.useRef<HTMLInputElement>(null);
-  const password = React.useRef<HTMLInputElement>(null);
-  const confirmPassword = React.useRef<HTMLInputElement>(null);
-  const email = React.useRef<HTMLInputElement>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegisterClick = () => {
-    // Placeholder : tu peux déplacer la logique dans un hook externe
-    console.log("Register clicked", {
-      firstName: firstName.current?.value,
-      lastName: lastName.current?.value,
-      email: email.current?.value,
-    });
+  const handleRegisterClick = async () => {
+    try {
+      if(password != confirmPassword) {
+        toast.info("Password does not match !!!");
+        return;
+      }
+      const response = await custom_axios.post(ApiConstants.USER.SIGN_UP, {
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword
+      });
+  
+      if (response.data.success) {
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+      }
+      toast.success("Account created sucessfully !!!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error);
+    }
   };
 
   return (
@@ -34,7 +56,8 @@ const SignUp = () => {
                   <div className="mb-4 md:mr-2 md:mb-0">
                     <label className="block mb-2 text-sm font-bold text-gray-700">First Name</label>
                     <input
-                      ref={firstName}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       className="w-full px-3 py-2 text-sm leading-tight text-gray-700 border rounded shadow focus:outline-none focus:shadow-outline"
                       type="text"
                       placeholder="First Name"
@@ -43,7 +66,8 @@ const SignUp = () => {
                   <div className="md:ml-2">
                     <label className="block mb-2 text-sm font-bold text-gray-700">Last Name</label>
                     <input
-                      ref={lastName}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       className="w-full px-3 py-2 text-sm leading-tight text-gray-700 border rounded shadow focus:outline-none focus:shadow-outline"
                       type="text"
                       placeholder="Last Name"
@@ -53,7 +77,8 @@ const SignUp = () => {
                 <div className="mb-4">
                   <label className="block mb-2 text-sm font-bold text-gray-700">Email</label>
                   <input
-                    ref={email}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow focus:outline-none focus:shadow-outline"
                     type="email"
                     placeholder="Email"
@@ -63,7 +88,8 @@ const SignUp = () => {
                   <div className="mb-4 md:mr-2 md:mb-0">
                     <label className="block mb-2 text-sm font-bold text-gray-700">Password</label>
                     <input
-                      ref={password}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow focus:outline-none focus:shadow-outline"
                       type="password"
                       placeholder="Password"
@@ -72,7 +98,8 @@ const SignUp = () => {
                   <div className="md:ml-2">
                     <label className="block mb-2 text-sm font-bold text-gray-700">Confirm Password</label>
                     <input
-                      ref={confirmPassword}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow focus:outline-none focus:shadow-outline"
                       type="password"
                       placeholder="Confirm Password"

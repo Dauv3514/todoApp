@@ -1,13 +1,19 @@
 import React from "react";
-import Logo from "../assets/logo.png"
+import Logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 interface NavBarProps {
   onNavigate: (path: string) => void;
-  onLogout: () => void;
   role?: string;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ onNavigate, onLogout, role }) => {
+const NavBar: React.FC<NavBarProps> = ({ onNavigate, role }) => {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   return (
     <nav className="flex items-center justify-between flex-wrap bg-purple-400 py-4 lg:px-12 shadow border-solid border-t-2 border-blue-700">
       <div className="flex justify-between lg:w-auto w-full lg:border-b-0 pl-6 pr-2 border-solid border-b-2 border-gray-300 pb-5 lg:pb-0">
@@ -44,7 +50,7 @@ const NavBar: React.FC<NavBarProps> = ({ onNavigate, onLogout, role }) => {
         </div>
         <div className="flex">
           <button
-            onClick={onLogout}
+            onClick={logout}
             className="block text-md px-4 py-2 text-white rounded ml-2 font-bold hover:text-white mt-4 hover:bg-blue-700 lg:mt-0"
           >
             Log out

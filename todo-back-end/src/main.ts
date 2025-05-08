@@ -9,6 +9,8 @@ async function bootstrap() {
   // 🔐 Activer la validation globale (déjà dans ton code)
   app.useGlobalPipes(new ValidationPipe());
 
+  app.enableCors();
+
   // 📄 Configuration de Swagger
   const config = new DocumentBuilder()
     .setTitle('Nom de ton API')
