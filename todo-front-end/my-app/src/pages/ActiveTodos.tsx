@@ -47,6 +47,26 @@ const ActiveTodos = () => {
     }
   }
 
+  const deleteTodo = async (todoId: number) => {
+    try {
+      await custom_axios.delete(ApiConstants.TODO.DELETE(todoId), { headers: { Authorization: "Bearer " + localStorage.getItem("token") } });
+      getAllNotCompletedTodos();
+      toast.success("Todo Deleted Sucessfully!!");
+    } catch(error) {
+      console.log("erreur lors de la suppression", error)
+    }
+  }
+
+  const markTodo = async (todoId: number) => {
+    try {
+      await custom_axios.patch(ApiConstants.TODO.MARK_COMPLETE(todoId), { headers: { Authorization: "Bearer " + localStorage.getItem("token") } });
+      getAllNotCompletedTodos();
+      toast.success("Todo Marked Sucessfully!!");
+    } catch(error) {
+      console.log("erreur lors de la suppression", error)
+    }
+  }
+
   useEffect(() => {
     if (todos.length === 0) getAllNotCompletedTodos();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,8 +89,8 @@ const ActiveTodos = () => {
               id={todo.id}
               todo={todo.title}
               dateTime={todo.date}
-              // deleteTodo={() => console.log("cam")}
-              // markCompelte={() => console.log("completed")}
+              deleteTodo={()=> deleteTodo(todo.id)}
+              markTodo={()=> markTodo(todo.id)}
             ></ActiveTodoList>
             })
           }

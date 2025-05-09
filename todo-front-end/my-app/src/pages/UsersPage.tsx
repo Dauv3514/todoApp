@@ -1,5 +1,9 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { ApiConstants } from "../api/ApiConstants";
+import custom_axios from "../axios/AxiosSetup";
 import NavBar from "../components/NavBar";
+import { getLoginInfo } from "../utils/LoginInfo";
+import { toast } from "react-toastify";
 
 interface UserModel {
   firstName: string;
@@ -9,12 +13,34 @@ interface UserModel {
   role: string;
 }
 
-interface UsersPageProps {
-  users: UserModel[];
-  onDeleteUser: (userId: number) => void;
-}
+const UsersPage = () => {
+  const [users, setUsers] = useState<UserModel[]>([]);
 
-const UsersPage: React.FC<UsersPageProps> = ({ users, onDeleteUser }) => {
+  const getAllUsers = async () => {
+    const role = getLoginInfo()?.role;
+    if(role != null && role == "ADMIN") {
+      const response = await custom_axios.get(ApiConstants.USER.FIND_ALL, { headers: { Authorization: "Bearer " + localStorage.getItem("token") } });
+      setUsers(response.data);
+    } else {
+      toast.info("Forbidden Resource");
+    }
+  };
+
+  const deleteUser = async (userId: number) => {
+    try {
+      await custom_axios.delete(ApiConstants.USER.DELETE(userId), { headers: { Authorization: "Bearer " + localStorage.getItem("token") } });
+      getAllUsers();
+      toast.success("User Deleted Sucessfully!!");
+    } catch(error) {
+      console.log("erreur lors de la suppression", error)
+    }
+  }
+
+  useEffect(() => {
+    if (users.length === 0) getAllUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div>
       <NavBar />
@@ -40,14 +66,13 @@ const UsersPage: React.FC<UsersPageProps> = ({ users, onDeleteUser }) => {
                         <td className="py-4 px-6 text-sm font-medium text-gray-500 whitespace-nowrap dark:text-white">{user.lastName}</td>
                         <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">{user.email}</td>
                         <td className="py-4 px-6 text-sm font-medium text-start whitespace-nowrap">
-                          {user.role !== "ADMIN" && (
                             <button
-                              onClick={() => onDeleteUser(user.id)}
+                              hidden={user.role === "ADMIN" ? true : false}
+                              onClick={() => deleteUser(user.id)}
                               className="bg-red-400 hover:bg-red-500 rounded-lg px-4 py-2 text-white shadow-sm text-xl"
                             >
                               Delete
                             </button>
-                          )}
                         </td>
                       </tr>
                     ))}

@@ -2,8 +2,8 @@ interface ActiveTodoListProps {
   id: number;
   todo: string;
   dateTime: string;
-  // onMarkComplete: (id: number) => void;
-  // onDelete: (id: number) => void;
+  deleteTodo: (id: number) => void;
+  markTodo: (id: number) => void;
 }
 
 const ActiveTodoList = (props : ActiveTodoListProps) => {
@@ -15,13 +15,13 @@ const ActiveTodoList = (props : ActiveTodoListProps) => {
         <div className="text-sm text-gray-500">{props.dateTime}</div>
       </div>
       <button
-        // onClick={() => props.onMarkComplete(props.id)}
+        onClick={() => props.markTodo(props.id)}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
       >
         Mark Completed
       </button>
       <button
-        // onClick={() => props.onDelete(props.id)}
+        onClick={() => props.deleteTodo(props.id)}
         className="bg-red-500 hover:bg-red-700 ml-2 text-white font-bold py-2 px-4 rounded-full"
       >
         Delete

@@ -36,12 +36,7 @@ const Routing = () => {
             path="/users"
             element={
               <ProtectedRoute>
-                <UsersPage
-                  users={[]} 
-                  onDeleteUser={(userId: number) => {
-                    console.log('Delete user:', userId);
-                  }} 
-                />
+                <UsersPage />
               </ProtectedRoute>
             }
           />
