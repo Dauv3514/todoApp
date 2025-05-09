@@ -12,28 +12,53 @@ interface TodoModel {
   id: number;
 }
 
-function ActiveTodos() {
+const ActiveTodos = () => {
+  const [title, setTitle] = useState("");
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const getAllNotCompletedTodos = async () => {
     const userId = getLoginInfo()?.userId;
     if(userId != null) {
-      const response = await custom_axios.get(ApiConstants.TODO.FIND_NOT_COMPLETED(userId));
+      const response = await custom_axios.get(ApiConstants.TODO.FIND_NOT_COMPLETED(userId), { headers: { Authorization: "Bearer " + localStorage.getItem("token") } });
       setTodos(response.data);
+      console.log(response.data);
     } else {
       toast.info("Désolé, tu n'es pas authentifié");
     }
   }
+  const saveTodo = async () => {
+    try {
+      if(title === ""){
+        toast.info("Ecrivez un titre svp");
+        return;
+      }
+      
+      const userId = getLoginInfo()?.userId;
+      if(userId != null) {
+        await custom_axios.post(ApiConstants.TODO.ADD(userId), { title: title}, { headers: { Authorization: "Bearer " + localStorage.getItem("token") } });
+        await getAllNotCompletedTodos();
+        setTitle('');
+        toast.success('Todo ajoutée avec succès');
+      } else {
+        toast.info("Désolé, tu n'es pas authentifié");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la todo:", error);
+      toast.error("Erreur lors de l'ajout de la todo");
+    }
+  }
+
   useEffect(() => {
     if (todos.length === 0) getAllNotCompletedTodos();
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div>
       <NavBar></NavBar>
       <div className="container mb-2 flex mx-auto w-full items-center justify-center">
         <ul className="flex flex-col p-4">
           <span className="text-black text-2xl">Enter Todo :</span>
-          <input className="mt-2 p-2 rounded-xl" />
-          <button className="w-36 px-2 py-4 text-white mx-auto mb-12 mt-2 bg-green-400 rounded-xl hover:bg-green-500 text-2xl">
+          <input value={title} onChange={(e)=> setTitle(e.target.value)} className="mt-2 p-2 rounded-xl" />
+          <button onClick={saveTodo} className="w-36 px-2 py-4 text-white mx-auto mb-12 mt-2 bg-green-400 rounded-xl hover:bg-green-500 text-2xl">
             Save
           </button>
 
@@ -44,9 +69,9 @@ function ActiveTodos() {
               id={todo.id}
               todo={todo.title}
               dateTime={todo.date}
-              deleteTodo={() => console.log("cam")}
-              markCompelte={() => console.log("completed")}
-            />
+              // deleteTodo={() => console.log("cam")}
+              // markCompelte={() => console.log("completed")}
+            ></ActiveTodoList>
             })
           }
         </ul>

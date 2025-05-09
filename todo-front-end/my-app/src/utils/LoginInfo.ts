@@ -9,11 +9,11 @@ interface UserInfo {
 }
 
 export const getLoginInfo = (): UserInfo | null => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     if(token != null) {
         const userInfo: UserInfo = jwtDecode(token);
         return userInfo;
     } else {
         return null;
     }
-}
+};
